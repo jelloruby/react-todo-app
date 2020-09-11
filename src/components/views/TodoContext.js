@@ -26,6 +26,7 @@ const initialTodos = [
 
 // reducer 는 현재 상태와 액션 객체를 파라미터로 받아와서 새로운 상태를 반환해주는 함수입니다.
 // reducer 에서 반환하는 상태는 곧 컴포넌트가 지닐 새로운 상태가 됩니다.
+// 각 컴포넌트에서 dispatch를 통해 생성된 action 을 이용한다.
 function todoReducer(state, action) {
     switch (action.type) {
         case 'CREATE':
@@ -33,11 +34,11 @@ function todoReducer(state, action) {
     
         case 'TOGGLE':
             return state.map(todo =>
-                todo.id === action.id ? {...todo, done: !todo.done } : todo
+                todo.id === action.id ? {...todo, done: !todo.done } : todo // 현재 state 의 id 와 action 의 id 를 비교
             )
 
         case 'REMOVE':
-            return state.filter(todo => todo.id !== action.id)
+            return state.filter(todo => todo.id !== action.id)              // id 가 일치 하는 것들을 제거
 
         default:
             throw new Error(`Unhandled action type: ${action.type}`)
