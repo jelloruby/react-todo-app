@@ -1,0 +1,98 @@
+import React, { useState, useRef, useMemo, useCallback } from 'react'
+import './App.css';
+
+// import Header from './components/Header'
+// import TodoAdd from './components/TodoAdd'
+// import TodoList from './components/TodoList'
+import CreateUser from './components/CreateUser'
+import UserList from './components/UserList'
+
+function countActiveUsers(users) {
+  console.log('활성 사용자 수를 세는중...');
+  return users.filter(user => user.active).length;
+}
+
+function App() {
+  const [inputs, setInputs] = useState({
+    username: '',
+    email: ''
+  })
+
+  const [users, setUsers] = useState([
+    {
+      id: 1,
+      username: 'velopert',
+      email: 'public.velopert@gmail.com',
+      active: true
+    },
+    {
+      id: 2,
+      username: 'tester',
+      email: 'tester@example.com',
+      active: false
+    },
+    {
+      id: 3,
+      username: 'liz',
+      email: 'liz@example.com',
+      active: false
+    }
+  ])
+
+  const { username, email } = inputs;
+
+  const nextId = useRef(4)
+
+  const onCreate = useCallback(() => {      // 배열 추가
+    const user = {              // 추가된 유저의 정보를 담고
+      id: nextId.current,
+      username,
+      email
+    }
+
+    setUsers(users => users.concat(user))    // 함수형 업데이트
+    //setUsers([...users, user])            // 원래의 배열에 추가한다.
+    
+    setInputs({
+      username: '',
+      email: ''
+    })
+
+    nextId.current += 1;        // id 를 1 증가시킨다.
+  }, [username, email])
+
+  const onRemove = useCallback(id => {
+    setUsers(users => users.filter(user => user.id !== id));   // user.id 랑 일치하는 것만 빼고 필터링해서 나머지 배열을 새로 만든다.
+  }, [])
+
+  const onToggle = useCallback(id => {
+    setUsers( users =>
+      users.map(user =>
+        user.id === id ? { ...user, active: !user.active } : user )
+    )
+  }, [])
+
+  const onChange = (e) => {     // value 값을 실시간으로 업데이트 해준다.
+    setInputs({
+      ...inputs,
+      [e.target.name] : e.target.value
+    })
+  }
+
+  const count = useMemo(() => countActiveUsers(users), [users]);
+
+  return (
+    <>
+      <CreateUser 
+        name={username}
+        email={email}
+        onChange={onChange}
+        OnCreate={onCreate}
+        />
+      <UserList users={users} onRemove={onRemove} onToggle={onToggle}/>
+      <div>활성사용자 수 : {count}</div>
+    </>
+  )
+}
+
+export default App
